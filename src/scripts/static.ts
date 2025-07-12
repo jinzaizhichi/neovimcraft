@@ -1,14 +1,19 @@
 import htmlFile from "../../data/html.json" with { type: "json" };
 import dbFile from "../../data/db.json" with { type: "json" };
 import configDbFile from "../../data/db-config.json" with { type: "json" };
-
 import { dirname } from "../deps.ts";
-import { format, relativeTimeFromDates } from "../date.ts";
 import { derivePluginData } from "../plugin-data.ts";
 import type { Plugin, PluginData, PluginMap, Tag, TagMap } from "../types.ts";
 import { getResourceId } from "../entities.ts";
 
 const OUTDIR = "./public";
+
+const zero = (num: number) => (num < 10 ? `0${num}` : `${num}`);
+export const format = (date: Date) => {
+  return `${date.getFullYear()}-${zero(date.getMonth() + 1)}-${
+    zero(date.getDate())
+  }`;
+};
 
 async function createFile(fname: string, data: string) {
   console.log(`Creating file ${fname}`);
@@ -198,15 +203,15 @@ const createPluginItem = (plugin: Plugin, tags: Tag[]) => {
 <div class="container plugin" data-username="${dataUsername}" data-repo="${dataRepo}" data-desc="${dataDesc}" data-tags="${dataTags}">
   <div class="header">
     <h2 class="item_header">
-      <a href="/plugin/${plugin.username}/${plugin.repo}/">${plugin.repo}</a>
+      <a href="/plugin/${plugin.username}/${plugin.repo}/">${plugin.username}/${plugin.repo}</a>
     </h2>
     <div class="metrics">
       ${repoLink}
     </div>
   </div>
   <div class="date">
-    <span>created ${relativeTimeFromDates(new Date(plugin.createdAt))} / </span>
-    <span>updated ${relativeTimeFromDates(new Date(plugin.updatedAt))}</span>
+    <span>created <time datetime="${plugin.createdAt}">${format(new Date(plugin.createdAt))}</time> / </span>
+    <span>updated <time datetime="${plugin.updatedAt}">${format(new Date(plugin.updatedAt))}</time></span>
   </div>
   <div class="desc">
     ${plugin.description}
@@ -261,8 +266,8 @@ const createConfigItem = (plugin: Plugin, tags: Tag[]) => {
     </div>
   </div>
   <div class="date">
-    <span>created ${relativeTimeFromDates(new Date(plugin.createdAt))} / </span>
-    <span>updated ${relativeTimeFromDates(new Date(plugin.updatedAt))}</span>
+    <span>created <time datetime="${plugin.createdAt}">${format(new Date(plugin.createdAt))}</time> / </span>
+    <span>updated <time datetime="${plugin.updatedAt}">${format(new Date(plugin.updatedAt))}</time></span>
   </div>
   <div class="desc">
     ${plugin.description}
@@ -537,11 +542,11 @@ const createPluginView = (plugin: Plugin, tags: Tag[]) => {
   <div class="timestamps">
     <div>
       <h5 class="ts_header">CREATED</h5>
-      <h2>${format(new Date(plugin.createdAt))}</h2>
+      <h2><time datetime="${plugin.createdAt}">${format(new Date(plugin.createdAt))}</time></h2>
     </div>
     <div>
       <h5 class="ts_header">UPDATED</h5>
-      <h2>${relativeTimeFromDates(new Date(plugin.updatedAt))}</h2>
+      <h2><time datetime="${plugin.updatedAt}">${format(new Date(plugin.updatedAt))}</time></h2>
     </div>
   </div>
   <hr />

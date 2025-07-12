@@ -51,8 +51,9 @@ build: clean
 .PHONY: build
 
 upload:
+	rsync ./public/_pgs_ignore pgs.sh:/$(PROJECT)/_pgs_ignore
 	rsync -rv ./public/ pgs.sh:/$(PROJECT)
-	ssh pgs.sh neovimcraft --to $(PROJECT) --write
+	ssh pgs.sh link neovimcraft --to $(PROJECT) --write
 	ssh pgs.sh retain neovimcraft- -n 1 --write
 .PHONY: upload
 
