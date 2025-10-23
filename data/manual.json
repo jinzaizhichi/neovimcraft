@@ -400,8 +400,6 @@
 			"repo": "vimade",
 			"tags": ["color", "split-and-window", "plugin"]
 		},
-		{},
-		{},
 		{
 			"type": "github",
 			"username": "NicolasGB",
