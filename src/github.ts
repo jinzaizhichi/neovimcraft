@@ -12,7 +12,7 @@ function delay(ms: number): Promise<void> {
 	return new Promise((resolve) => setTimeout(() => resolve(), ms));
 }
 
-const nextRe = new RegExp(/\<([^<]+)\>; rel="next"/);
+const nextRe = new RegExp(/<([^<]+)>; rel="next"/);
 
 async function githubApi<D = any>(
 	endpoint: string,
@@ -25,10 +25,10 @@ async function githubApi<D = any>(
 	});
 
 	const rateLimitRemaining = parseInt(
-		res.headers.get("X-RateLimit-Remaining") || "-1",
+		res.headers.get("X-RateLimit-Remaining") || "-1", 10
 	);
 	// this value is in seconds, not ms
-	const rateLimitReset = parseInt(res.headers.get("X-RateLimit-Reset") || "-1");
+	const rateLimitReset = parseInt(res.headers.get("X-RateLimit-Reset") || "-1", 10);
 	console.log(`rate limit remaining: ${rateLimitRemaining}`);
 	if (rateLimitRemaining === 1 || rateLimitRemaining === 0) {
 		const now = Date.now();

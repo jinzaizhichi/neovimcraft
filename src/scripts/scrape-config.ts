@@ -1,6 +1,6 @@
 import { fetchTopics, ghToken } from "../github.ts";
 import { createResource, getResourceId } from "../entities.ts";
-import { ResourceMap } from "../types.ts";
+import type { ResourceMap } from "../types.ts";
 import { denyRepos } from "../filter.ts";
 
 init().catch(console.error);

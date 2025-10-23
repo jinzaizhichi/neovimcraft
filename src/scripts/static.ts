@@ -17,7 +17,7 @@ export const format = (date: Date) => {
 
 async function createFile(fname: string, data: string) {
 	console.log(`Creating file ${fname}`);
-	await import("fs/promises").then((fs) =>
+	await import("node:fs/promises").then((fs) =>
 		fs.mkdir(dirname(fname), { recursive: true }),
 	);
 	await Bun.write(fname, data);

@@ -45,7 +45,7 @@ clean:
 .PHONY: clean
 
 build: clean
-	deno run --allow-write src/scripts/static.ts
+	bun run src/scripts/static.ts
 	cp ./data/db.json ./public/db.json
 	cp -r ./static/* ./public
 .PHONY: build
@@ -61,11 +61,11 @@ deploy: scrape build upload
 .PHONY: deploy
 
 fmt:
-	deno fmt
+	bun run biome format --write
 .PHONY: format
 
 test:
-	deno lint
+	bun run biome lint
 .PHONY: test
 
 config: download-config process html

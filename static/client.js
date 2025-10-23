@@ -67,7 +67,7 @@ function createFilter(pluginsEl) {
 
 function updateLinks(search) {
 	const links = must("#sort_links");
-	for (let link of links.children) {
+	for (const link of links.children) {
 		const r = new URL(link.href);
 		if (search) {
 			r.searchParams.set("search", search);
@@ -97,7 +97,7 @@ function mustAll(pattern) {
 
 function debounce(fn, delay) {
 	let timeoutID;
-	return function (...args) {
+	return (...args) => {
 		if (timeoutID) {
 			clearTimeout(timeoutID);
 		}

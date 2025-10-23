@@ -41,7 +41,7 @@ async function cli(opt: "config" | "plugin") {
 	}
 
 	const name = (await readInput("name (username/repo):")) || "";
-	let [username, repo] = name.split("/");
+	const [username, repo] = name.split("/");
 	let tags: string[] = [];
 	if (opt === "plugin") {
 		console.log(
