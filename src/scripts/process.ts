@@ -1,16 +1,11 @@
-import resourceFile from "../../data/resources.json" with { type: "json" };
-import resourceConfigFile from "../../data/resources-config.json" with {
-  type: "json",
-};
+import resourceFile from "../../data/resources.json";
+import resourceConfigFile from "../../data/resources-config.json";
 
 import type { Plugin, Resource } from "../types.ts";
 import { createPlugin, getResourceId } from "../entities.ts";
 import { fetchGithubData, ghToken } from "../github.ts";
-// import { fetchSrhtData } from "../stht.ts";
 
-// const srhtToken = Deno.env.get("SRHT_ACCESS_TOKEN") || "";
-
-const option = Deno.args[0];
+const option = process.argv[2];
 if (option === "missing") {
   console.log("PROCESSING MISSING RESOURCES");
   processMissingResources().then(saveData).catch(console.error);
@@ -27,7 +22,7 @@ if (option === "missing") {
 }
 
 async function processMissingResources() {
-  const dbFile = await Deno.readTextFile("./data/db.json");
+  const dbFile = await Bun.file("./data/db.json").text();
   const db = JSON.parse(dbFile.toString());
   const missing: Resource[] = [];
   const resources = resourceFile.resources as Resource[];
@@ -41,7 +36,7 @@ async function processMissingResources() {
   console.log(`Missing ${missing.length} resources`);
 
   const results = await processResources(missing);
-  const markdownFile = await Deno.readTextFile("./data/markdown.json");
+  const markdownFile = await Bun.file("./data/markdown.json").text();
   const markdownJson = JSON.parse(markdownFile.toString());
   const plugins = { ...db.plugins, ...results.plugins };
   const markdown = { ...markdownJson.markdown, ...results.markdown };
@@ -57,36 +52,10 @@ async function processResources(resources: Resource[]) {
   for (let i = 0; i < resources.length; i += 1) {
     const d = resources[i];
 
-    if (d.type === "srht") {
-      continue;
-      /*
-      01/12/2024 - SUSPENDING until sr.ht is back online
-
-      const result = await fetchSrhtData({ ...d, token: srhtToken });
-      const id = getResourceId(d);
-      if (!result.ok) {
-        console.log(result);
-        continue;
-      }
-
-      const repo = result.data.repo;
-      markdown[id] = result.data.readme;
-      plugins[id] = createPlugin({
-        type: "srht",
-        id,
-        username: d.username,
-        repo: d.repo,
-        tags: d.tags,
-        link: `https://git.sr.ht/~${id}`,
-        name: repo.name,
-        description: repo.description,
-        createdAt: repo.created,
-        updatedAt: repo.updated,
-        branch: result.data.branch,
-      });*/
-    } else if (d.type === "github") {
+    if (d.type === "github") {
       const result = await fetchGithubData({ ...d, token: ghToken });
       if (!result.ok) {
+        console.error(result);
         continue;
       }
 
@@ -132,10 +101,11 @@ async function saveData({
   plugins: { [key: string]: Plugin };
   markdown: { [key: string]: string };
 }) {
+  console.log("SAVING DATA");
   const pluginJson = JSON.stringify({ plugins }, null, 2);
   const markdownJson = JSON.stringify({ markdown });
-  await Deno.writeTextFile("./data/db.json", pluginJson);
-  await Deno.writeTextFile("./data/markdown.json", markdownJson);
+  await Bun.write("./data/db.json", pluginJson);
+  await Bun.write("./data/markdown.json", markdownJson);
 }
 
 async function saveConfigData({
@@ -145,8 +115,14 @@ async function saveConfigData({
   plugins: { [key: string]: Plugin };
   markdown: { [key: string]: string };
 }) {
+  console.log("SAVING CONFIG DATA");
   const pluginJson = JSON.stringify({ plugins }, null, 2);
   const markdownJson = JSON.stringify({ markdown });
-  await Deno.writeTextFile("./data/db-config.json", pluginJson);
-  await Deno.writeTextFile("./data/markdown-config.json", markdownJson);
+  console.log("MADE IT");
+  try {
+    await Bun.write("./data/db-config.json", pluginJson);
+    await Bun.write("./data/markdown-config.json", markdownJson);
+  } catch (err) {
+    console.error(err);
+  }
 }

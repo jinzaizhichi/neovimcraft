@@ -95,5 +95,5 @@ async function saveScrapeData(resources: Resource[]) {
   });
   const data = { resources: newResources };
   const json = JSON.stringify(data, null, 2);
-  await Deno.writeTextFile("./data/scrape.json", json);
+  await Bun.write("./data/scrape.json", json);
 }

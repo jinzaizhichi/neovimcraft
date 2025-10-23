@@ -25,7 +25,7 @@ async function save(resources: ResourceMap) {
   const data = { resources: Object.values(resources) };
   const json = JSON.stringify(data, null, 2);
 
-  await Deno.writeTextFile("./data/scrape-config.json", json);
+  await Bun.write("./data/scrape-config.json", json);
 }
 
 async function dl(resources: ResourceMap, topic: string) {

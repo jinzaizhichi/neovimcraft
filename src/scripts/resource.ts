@@ -1,7 +1,5 @@
-import manualFile from "../../data/manual.json" with { type: "json" };
-import manualConfigFile from "../../data/manual-config.json" with {
-  type: "json",
-};
+import manualFile from "../../data/manual.json";
+import manualConfigFile from "../../data/manual-config.json";
 import type { Resource } from "../types.ts";
 import { createResource } from "../entities.ts";
 
@@ -10,7 +8,7 @@ type Option = "plugin" | "config";
 const forges = ["github", "srht"];
 const forgesStr = forges.join(",");
 
-let option = Deno.args[0];
+let option = process.argv[2];
 if (!option) {
   option = "plugin";
 }
@@ -26,22 +24,22 @@ async function save(resource: Resource | undefined) {
   if (option === "plugin") {
     manualFile.resources.push(resource);
     const json = JSON.stringify(manualFile, null, 2);
-    await Deno.writeTextFile("./data/manual.json", json);
+    await Bun.write("./data/manual.json", json);
   } else {
     manualConfigFile.resources.push(resource);
     const json = JSON.stringify(manualConfigFile, null, 2);
-    await Deno.writeTextFile("./data/manual-config.json", json);
+    await Bun.write("./data/manual-config.json", json);
   }
 }
 
-function cli(opt: "config" | "plugin") {
-  const type = prompt(`code forge [${forgesStr}] (default: github):`) ||
+async function cli(opt: "config" | "plugin") {
+  const type = await readInput(`code forge [${forgesStr}] (default: github):`) ||
     "github";
   if (!forges.includes(type)) {
     throw new Error(`${type} is not a valid code forge, choose ${forgesStr}`);
   }
 
-  const name = prompt("name (username/repo):") || "";
+  const name = await readInput("name (username/repo):") || "";
   let [username, repo] = name.split("/");
   if (type === "srht" && username[0] === "~") {
     username = username.replace("~", "");
@@ -52,7 +50,7 @@ function cli(opt: "config" | "plugin") {
     console.log(
       "\nNOTICE: Please review all current tags and see if any fit, only add new tags if absolutely necessary\n",
     );
-    const tagsRes = prompt("tags (comma separated):") || "";
+    const tagsRes = await readInput("tags (comma separated):") || "";
     tags = tagsRes.split(",");
   }
 
@@ -62,4 +60,12 @@ function cli(opt: "config" | "plugin") {
     repo,
     tags,
   });
+}
+
+async function readInput(prompt: string): Promise<string> {
+  console.log(prompt);
+  for await (const line of console) {
+    return line.trim();
+  }
+  return "";
 }

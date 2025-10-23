@@ -25,9 +25,9 @@ async function clean(
     mdFile: string;
   },
 ) {
-  const file = await Deno.readTextFile(dbFile);
+  const file = await Bun.file(dbFile).text();
   const db = JSON.parse(file.toString());
-  const markdownFile = await Deno.readTextFile(mdFile);
+  const markdownFile = await Bun.file(mdFile).text();
   const markdownDb = JSON.parse(markdownFile.toString());
 
   const plugins = Object.values(db.plugins) as Plugin[];
@@ -63,7 +63,7 @@ async function clean(
 async function save(nextDb: { [key: string]: string }) {
   try {
     const json = JSON.stringify({ html: nextDb }, null, 2);
-    await Deno.writeTextFile("./data/html.json", json);
+    await Bun.write("./data/html.json", json);
   } catch (err) {
     console.error(err);
   }

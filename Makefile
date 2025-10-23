@@ -1,39 +1,39 @@
 PROJECT="neovimcraft-$(shell date +%s)"
 
 dev:
-	deno run --allow-read --allow-net src/dev.ts
+	bun run src/dev.ts
 .PHONY: dev
 
 resource:
-	deno run --allow-write src/scripts/resource.ts
+	bun run src/scripts/resource.ts
 .PHONY: resource
 
 resource-config:
-	deno run --allow-write src/scripts/resource.ts config
+	bun run src/scripts/resource.ts config
 .PHONY: resource-config
 
 download-config:
-	deno run --allow-env --allow-write --allow-net src/scripts/scrape-config.ts
+	bun run src/scripts/scrape-config.ts
 .PHONY: download-config
 
 download: download-config
-	deno run --allow-write --allow-net src/scripts/scrape.ts
+	bun run src/scripts/scrape.ts
 .PHONY: download
 
 patch:
-	deno run --allow-write src/scripts/patch.ts
+	bun run src/scripts/patch.ts
 .PHONY: patch
 
 process:
-	deno run --allow-write --allow-env --allow-net src/scripts/process.ts
+	bun run src/scripts/process.ts
 .PHONY: process
 
 missing:
-	deno run --allow-write --allow-env --allow-net --allow-read src/scripts/process.ts missing
+	bun run src/scripts/process.ts missing
 .PHONY: missing
 
 html:
-	deno run --allow-write --allow-read src/scripts/html.ts
+	bun run src/scripts/html.ts
 .PHONY: html
 
 scrape: download patch process html

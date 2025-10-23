@@ -1,10 +1,10 @@
 import type { FetchRepoProps, Resp } from "./types.ts";
 
-import { encode } from "./deps.ts";
+import { Buffer } from "./deps.ts";
 
-const accessToken = Deno.env.get("GITHUB_ACCESS_TOKEN") || "";
-const accessUsername = Deno.env.get("GITHUB_USERNAME") || "";
-export const ghToken = encode(`${accessUsername}:${accessToken}`);
+const accessToken = process.env.GITHUB_ACCESS_TOKEN || "";
+const accessUsername = process.env.GITHUB_USERNAME || "";
+export const ghToken = Buffer.from(`${accessUsername}:${accessToken}`).toString('base64');
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(() => resolve(), ms));
@@ -23,10 +23,10 @@ async function githubApi<D = any>(
   });
 
   const rateLimitRemaining = parseInt(
-    res.headers.get("X-RateLimit-Remaining") || "0",
+    res.headers.get("X-RateLimit-Remaining") || "-1",
   );
   // this value is in seconds, not ms
-  const rateLimitReset = parseInt(res.headers.get("X-RateLimit-Reset") || "0");
+  const rateLimitReset = parseInt(res.headers.get("X-RateLimit-Reset") || "-1");
   console.log(`rate limit remaining: ${rateLimitRemaining}`);
   if (rateLimitRemaining === 1 || rateLimitRemaining === 0) {
     const now = Date.now();
@@ -34,9 +34,11 @@ async function githubApi<D = any>(
     const wait = (rateLimitReset * 1000) + RESET_BUFFER - now;
     // ms -> s -> min
     const mins = Math.ceil(wait / 1000 / 60);
-    console.log(
-      `Hit github rate limit, waiting ${mins} mins`,
-    );
+    if (mins > 0) {
+      console.log(
+        `Hit github rate limit, waiting ${mins} mins`,
+      );
+    }
     await delay(wait);
   }
 
@@ -94,7 +96,7 @@ async function fetchReadme({
   }
 
   const url = result.data.download_url;
-  console.log(`Fetching ${url}`);
+  console.log(`Fetching README ${url}`);
   const readme = await fetch(url);
   const data = await readme.text();
   return {
@@ -124,6 +126,15 @@ async function fetchRepo({
   repo,
   token,
 }: FetchRepoProps): Promise<Resp<RepoData>> {
+  if (!username || !repo) {
+    return {
+      ok: false,
+      data: {
+        status: 0,
+        error: new Error(`malformed repo ${username}/${repo}`),
+      }
+    }
+  }
   const result = await githubApi(`/repos/${username}/${repo}`, token);
   return result;
 }
@@ -160,29 +171,34 @@ interface GithubData {
 export async function fetchGithubData(
   props: FetchRepoProps,
 ): Promise<Resp<GithubData>> {
+  console.log(`Fetching repo ${props.username}/${props.repo}`);
   const repo = await fetchRepo(props);
-  if (repo.ok === false) {
-    console.log(`${repo.data.status}: ${repo.data.error.message}`);
+  if (!repo.ok) {
     return repo;
   }
 
+  console.log(`Fetching branch ${props.username}/${props.repo}`);
   const branch = await fetchBranch({
     ...props,
     branch: repo.data.default_branch,
   });
-  if (branch.ok === false) {
-    console.log(`${branch.data.status}: ${branch.data.error.message}`);
+  if (!branch.ok) {
+    console.error(`${branch.data.status}: ${branch.data.error.message}`);
+    return branch;
   }
 
+  console.log(`Fetching readme ${props.username}/${props.repo}`);
   const readme = await fetchReadme({
     username: props.username,
     repo: props.repo,
     token: props.token,
   });
-  if (readme.ok === false) {
-    console.log(`${readme.data.status}: ${readme.data.error.message}`);
+  if (!readme.ok) {
+    console.error(`${readme.data.status}: ${readme.data.error.message}`);
+    return readme;
   }
 
+  console.log(`Fetching complete ${props.username}/${props.repo}`);
   return {
     ok: true,
     data: {
@@ -217,6 +233,8 @@ export async function fetchTopics(topic: string, token: string) {
         next = result.next;
         next = next.replace('https://api.github.com', '');
       } */
+    } else {
+      console.error(result.data);
     }
   }
 

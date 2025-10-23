@@ -1,11 +1,7 @@
-import scrapePluginData from "../../data/scrape.json" with { type: "json" };
-import manualPluginData from "../../data/manual.json" with { type: "json" };
-import scrapeConfigData from "../../data/scrape-config.json" with {
-  type: "json",
-};
-import manualConfigData from "../../data/manual-config.json" with {
-  type: "json",
-};
+import scrapePluginData from "../../data/scrape.json";
+import manualPluginData from "../../data/manual.json";
+import scrapeConfigData from "../../data/scrape-config.json";
+import manualConfigData from "../../data/manual-config.json";
 
 import type { Resource, ResourceMap } from "../types.ts";
 import { getResourceId } from "../entities.ts";
@@ -17,13 +13,13 @@ async function init() {
     scrapeData: scrapePluginData as any,
     manualData: manualPluginData as any,
   });
-  await Deno.writeTextFile("./data/resources.json", plugins);
+  await Bun.write("./data/resources.json", plugins);
 
   const config = patch({
     scrapeData: scrapeConfigData as any,
     manualData: manualConfigData as any,
   });
-  await Deno.writeTextFile("./data/resources-config.json", config);
+  await Bun.write("./data/resources-config.json", config);
 }
 
 interface ResourceContainer {
