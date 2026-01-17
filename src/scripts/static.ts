@@ -59,7 +59,7 @@ const createAds = () => {
 
 <div class="ad">
   <div><a href="https://prose.sh">prose.sh</a></div>
-  <div>Serve your blog using SSH</div>
+  <div>Write your blog with markdown. rsync and you're live.</div>
 </div>
 
 <div class="ad">
