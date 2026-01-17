@@ -48,12 +48,12 @@ const createAds = () => {
 </div>
 
 <div class="ad">
-  <div><a href="https://pgs.sh">pgs.sh</a></div>
-  <div>Host static sites on our global platform using SSH</div>
+  <div><a href="https://pico.sh/pgs">pgs.sh</a></div>
+  <div>Deploy static sites with a single command. rsync and you're live.</div>
 </div>
 
 <div class="ad">
-  <div><a href="https://tuns.sh">tuns.sh</a></div>
+  <div><a href="https://pico.sh/tuns">tuns.sh</a></div>
   <div>Host public web services on localhost using SSH</div>
 </div>
 
