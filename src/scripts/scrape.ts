@@ -1,3 +1,4 @@
+import { writeFile } from "node:fs/promises";
 import { marked } from "../deps.ts";
 import type { Resource } from "../types.ts";
 import { createResource } from "../entities.ts";
@@ -47,8 +48,7 @@ function processMarkdown(text: string) {
 					if (!tt.tokens) return;
 
 					// hardcoded deny-list for headings
-					for (let i = 0; i < headings.length; i += 1) {
-						const heading = headings[i];
+					for (const heading of headings) {
 						if (
 							["contents", "vim", "ui", "wishlist", "resource"].includes(
 								heading,
@@ -76,9 +76,11 @@ function processMarkdown(text: string) {
 						.replace("https://github.com/", "")
 						.replace("http://github.com", "");
 					const d = href.split("/");
-					resource.username = d[0];
-					resource.repo = d[1].replace(/#.+/, "");
-					resources.push(resource);
+					if (d[0] && d[1]) {
+						resource.username = d[0];
+						resource.repo = d[1].replace(/#.+/, "");
+						resources.push(resource);
+					}
 				});
 			});
 		}
@@ -96,5 +98,5 @@ async function saveScrapeData(resources: Resource[]) {
 	});
 	const data = { resources: newResources };
 	const json = JSON.stringify(data, null, 2);
-	await Bun.write("./data/scrape.json", json);
+	await writeFile("./data/scrape.json", json);
 }

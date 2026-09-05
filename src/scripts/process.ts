@@ -1,5 +1,8 @@
-import resourceFile from "../../data/resources.json";
-import resourceConfigFile from "../../data/resources-config.json";
+import { readFile, writeFile } from "node:fs/promises";
+import resourceFile from "../../data/resources.json" with { type: "json" };
+import resourceConfigFile from "../../data/resources-config.json" with {
+	type: "json",
+};
 
 import type { Plugin, Resource } from "../types.ts";
 import { createPlugin, getResourceId } from "../entities.ts";
@@ -22,7 +25,7 @@ if (option === "missing") {
 }
 
 async function processMissingResources() {
-	const dbFile = await Bun.file("./data/db.json").text();
+	const dbFile = await readFile("./data/db.json", "utf8");
 	const db = JSON.parse(dbFile.toString());
 	const missing: Resource[] = [];
 	const resources = resourceFile.resources as Resource[];
@@ -36,7 +39,7 @@ async function processMissingResources() {
 	console.log(`Missing ${missing.length} resources`);
 
 	const results = await processResources(missing);
-	const markdownFile = await Bun.file("./data/markdown.json").text();
+	const markdownFile = await readFile("./data/markdown.json", "utf8");
 	const markdownJson = JSON.parse(markdownFile.toString());
 	const plugins = { ...db.plugins, ...results.plugins };
 	const markdown = { ...markdownJson.markdown, ...results.markdown };
@@ -51,6 +54,7 @@ async function processResources(resources: Resource[]) {
 
 	for (let i = 0; i < resources.length; i += 1) {
 		const d = resources[i];
+		if (!d) continue;
 
 		if (d.type === "github") {
 			const result = await fetchGithubData({ ...d, token: ghToken });
@@ -104,8 +108,8 @@ async function saveData({
 	console.log("SAVING DATA");
 	const pluginJson = JSON.stringify({ plugins }, null, 2);
 	const markdownJson = JSON.stringify({ markdown });
-	await Bun.write("./data/db.json", pluginJson);
-	await Bun.write("./data/markdown.json", markdownJson);
+	await writeFile("./data/db.json", pluginJson);
+	await writeFile("./data/markdown.json", markdownJson);
 }
 
 async function saveConfigData({
@@ -120,8 +124,8 @@ async function saveConfigData({
 	const markdownJson = JSON.stringify({ markdown });
 	console.log("MADE IT");
 	try {
-		await Bun.write("./data/db-config.json", pluginJson);
-		await Bun.write("./data/markdown-config.json", markdownJson);
+		await writeFile("./data/db-config.json", pluginJson);
+		await writeFile("./data/markdown-config.json", markdownJson);
 	} catch (err) {
 		console.error(err);
 	}

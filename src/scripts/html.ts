@@ -1,3 +1,4 @@
+import { readFile, writeFile } from "node:fs/promises";
 import { marked } from "../deps.ts";
 import type { Plugin } from "../types.ts";
 
@@ -27,9 +28,9 @@ async function clean({
 	dbFile: string;
 	mdFile: string;
 }) {
-	const file = await Bun.file(dbFile).text();
+	const file = await readFile(dbFile, "utf8");
 	const db = JSON.parse(file.toString());
-	const markdownFile = await Bun.file(mdFile).text();
+	const markdownFile = await readFile(mdFile, "utf8");
 	const markdownDb = JSON.parse(markdownFile.toString());
 
 	const plugins = Object.values(db.plugins) as Plugin[];
@@ -56,7 +57,7 @@ async function clean({
 
 		const markdown = markdownDb.markdown[plugin.id];
 		if (!markdown) return;
-		const html = marked(markdown);
+		const html = marked(markdown) as string;
 		htmlDb[plugin.id] = html;
 	});
 }
@@ -64,7 +65,7 @@ async function clean({
 async function save(nextDb: { [key: string]: string }) {
 	try {
 		const json = JSON.stringify({ html: nextDb }, null, 2);
-		await Bun.write("./data/html.json", json);
+		await writeFile("./data/html.json", json);
 	} catch (err) {
 		console.error(err);
 	}

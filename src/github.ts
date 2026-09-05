@@ -2,8 +2,8 @@ import type { FetchRepoProps, Resp } from "./types.ts";
 
 import { Buffer } from "./deps.ts";
 
-const accessToken = process.env.GITHUB_ACCESS_TOKEN || "";
-const accessUsername = process.env.GITHUB_USERNAME || "";
+const accessToken = process.env["GITHUB_ACCESS_TOKEN"] || "";
+const accessUsername = process.env["GITHUB_USERNAME"] || "";
 export const ghToken = Buffer.from(`${accessUsername}:${accessToken}`).toString(
 	"base64",
 );
@@ -25,10 +25,14 @@ async function githubApi<D = any>(
 	});
 
 	const rateLimitRemaining = parseInt(
-		res.headers.get("X-RateLimit-Remaining") || "-1", 10
+		res.headers.get("X-RateLimit-Remaining") || "-1",
+		10,
 	);
 	// this value is in seconds, not ms
-	const rateLimitReset = parseInt(res.headers.get("X-RateLimit-Reset") || "-1", 10);
+	const rateLimitReset = parseInt(
+		res.headers.get("X-RateLimit-Reset") || "-1",
+		10,
+	);
 	console.log(`rate limit remaining: ${rateLimitRemaining}`);
 	if (rateLimitRemaining === 1 || rateLimitRemaining === 0) {
 		const now = Date.now();
@@ -42,7 +46,7 @@ async function githubApi<D = any>(
 		await delay(wait);
 	}
 
-	let data = null;
+	let data: unknown = null;
 	try {
 		data = await res.json();
 	} catch {
@@ -61,7 +65,7 @@ async function githubApi<D = any>(
 		const link = res.headers.get("link");
 		if (link) {
 			const paginated = nextRe.exec(link || "");
-			if (paginated && paginated.length > 1) {
+			if (paginated && paginated[1]) {
 				next = paginated[1];
 			}
 		}
@@ -69,7 +73,7 @@ async function githubApi<D = any>(
 		return {
 			ok: true,
 			next,
-			data,
+			data: data as D,
 		};
 	}
 

@@ -1,5 +1,10 @@
-import manualFile from "../../data/manual.json";
-import manualConfigFile from "../../data/manual-config.json";
+import { writeFile } from "node:fs/promises";
+import readline from "node:readline/promises";
+import { stdin as input, stdout as output } from "node:process";
+import manualFile from "../../data/manual.json" with { type: "json" };
+import manualConfigFile from "../../data/manual-config.json" with {
+	type: "json",
+};
 import type { Resource } from "../types.ts";
 import { createResource } from "../entities.ts";
 
@@ -24,11 +29,11 @@ async function save(resource: Resource | undefined) {
 	if (option === "plugin") {
 		manualFile.resources.push(resource);
 		const json = JSON.stringify(manualFile, null, 2);
-		await Bun.write("./data/manual.json", json);
+		await writeFile("./data/manual.json", json);
 	} else {
 		manualConfigFile.resources.push(resource);
 		const json = JSON.stringify(manualConfigFile, null, 2);
-		await Bun.write("./data/manual-config.json", json);
+		await writeFile("./data/manual-config.json", json);
 	}
 }
 
@@ -60,9 +65,8 @@ async function cli(opt: "config" | "plugin") {
 }
 
 async function readInput(prompt: string): Promise<string> {
-	console.log(prompt);
-	for await (const line of console) {
-		return line.trim();
-	}
-	return "";
+	const rl = readline.createInterface({ input, output });
+	const answer = await rl.question(`${prompt}\n`);
+	rl.close();
+	return answer.trim();
 }

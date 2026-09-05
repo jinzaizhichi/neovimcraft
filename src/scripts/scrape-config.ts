@@ -1,3 +1,4 @@
+import { writeFile } from "node:fs/promises";
 import { fetchTopics, ghToken } from "../github.ts";
 import { createResource, getResourceId } from "../entities.ts";
 import type { ResourceMap } from "../types.ts";
@@ -25,7 +26,7 @@ async function save(resources: ResourceMap) {
 	const data = { resources: Object.values(resources) };
 	const json = JSON.stringify(data, null, 2);
 
-	await Bun.write("./data/scrape-config.json", json);
+	await writeFile("./data/scrape-config.json", json);
 }
 
 async function dl(resources: ResourceMap, topic: string) {

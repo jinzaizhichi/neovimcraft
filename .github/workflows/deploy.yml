@@ -16,9 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: denoland/setup-deno@v1
+    - uses: actions/setup-node@v4
       with:
-        deno-version: "~1.42"
+        node-version: "22"
+    - run: npm ci
     - run: make scrape
     - run: make build
     - run: ls -lah ./public

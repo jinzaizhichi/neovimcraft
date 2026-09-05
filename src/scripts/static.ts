@@ -1,6 +1,7 @@
-import htmlFile from "../../data/html.json";
-import dbFile from "../../data/db.json";
-import configDbFile from "../../data/db-config.json";
+import { mkdir, writeFile } from "node:fs/promises";
+import htmlFile from "../../data/html.json" with { type: "json" };
+import dbFile from "../../data/db.json" with { type: "json" };
+import configDbFile from "../../data/db-config.json" with { type: "json" };
 import { dirname } from "../deps.ts";
 import { derivePluginData } from "../plugin-data.ts";
 import type { Plugin, PluginData, PluginMap, Tag, TagMap } from "../types.ts";
@@ -17,10 +18,8 @@ export const format = (date: Date) => {
 
 async function createFile(fname: string, data: string) {
 	console.log(`Creating file ${fname}`);
-	await import("node:fs/promises").then((fs) =>
-		fs.mkdir(dirname(fname), { recursive: true }),
-	);
-	await Bun.write(fname, data);
+	await mkdir(dirname(fname), { recursive: true });
+	await writeFile(fname, data, "utf8");
 }
 
 const sortNum = (a: number, b: number) => b - a;
@@ -279,7 +278,7 @@ const createConfigItem = (plugin: Plugin, tags: Tag[]) => {
 };
 
 function getTags(tagDb: TagMap, tags: string[]): Tag[] {
-	return tags.map((t) => tagDb[t]).filter(Boolean);
+	return tags.map((t) => tagDb[t]).filter((t): t is Tag => Boolean(t));
 }
 
 const createAboutPage = () => {

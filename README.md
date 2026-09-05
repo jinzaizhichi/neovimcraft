@@ -20,7 +20,7 @@ https://github.com/neurosnap/nvim.sh
 
 ## Developing
 
-neovimcraft is a static site.  We use `deno` for static site generation.
+neovimcraft is a static site.  We use `node` for static site generation.
 
 You need to add a couple environment variables related to using the github api:
 

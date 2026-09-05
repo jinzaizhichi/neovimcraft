@@ -1,39 +1,39 @@
 PROJECT="neovimcraft-$(shell date +%s)"
 
 dev:
-	bun run src/dev.ts
+	node src/dev.ts
 .PHONY: dev
 
 resource:
-	bun run src/scripts/resource.ts
+	node src/scripts/resource.ts
 .PHONY: resource
 
 resource-config:
-	bun run src/scripts/resource.ts config
+	node src/scripts/resource.ts config
 .PHONY: resource-config
 
 download-config:
-	bun run src/scripts/scrape-config.ts
+	node src/scripts/scrape-config.ts
 .PHONY: download-config
 
 download: download-config
-	bun run src/scripts/scrape.ts
+	node src/scripts/scrape.ts
 .PHONY: download
 
 patch:
-	bun run src/scripts/patch.ts
+	node src/scripts/patch.ts
 .PHONY: patch
 
 process:
-	bun run src/scripts/process.ts
+	node src/scripts/process.ts
 .PHONY: process
 
 missing:
-	bun run src/scripts/process.ts missing
+	node src/scripts/process.ts missing
 .PHONY: missing
 
 html:
-	bun run src/scripts/html.ts
+	node src/scripts/html.ts
 .PHONY: html
 
 scrape: download patch process html
@@ -45,7 +45,7 @@ clean:
 .PHONY: clean
 
 build: clean
-	bun run src/scripts/static.ts
+	node src/scripts/static.ts
 	cp ./data/db.json ./public/db.json
 	cp -r ./static/* ./public
 .PHONY: build
@@ -61,11 +61,11 @@ deploy: scrape build upload
 .PHONY: deploy
 
 fmt:
-	bun run biome format --write
+	npx biome format --write
 .PHONY: format
 
 test:
-	bun run biome lint
+	npx biome lint
 .PHONY: test
 
 config: download-config process html
