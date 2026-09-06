@@ -1,9 +1,5 @@
 PROJECT="neovimcraft-$(shell date +%s)"
 
-dev:
-	node src/dev.ts
-.PHONY: dev
-
 resource:
 	node src/scripts/resource.ts
 .PHONY: resource
