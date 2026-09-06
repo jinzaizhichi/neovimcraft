@@ -3,10 +3,9 @@ import resourceFile from "../../data/resources.json" with { type: "json" };
 import resourceConfigFile from "../../data/resources-config.json" with {
 	type: "json",
 };
-
-import type { Plugin, Resource } from "../types.ts";
 import { createPlugin, getResourceId } from "../entities.ts";
 import { fetchGithubData, ghToken } from "../github.ts";
+import type { Plugin, Resource } from "../types.ts";
 
 const option = process.argv[2];
 if (option === "missing") {

@@ -37,7 +37,7 @@ async function clean({
 	plugins.forEach((plugin) => {
 		console.log(`processing ${plugin.id}`);
 		marked.use({
-			walkTokens: (token: any) => {
+			walkTokens: (token) => {
 				const domain = "https://github.com";
 				const pre = `${domain}/${plugin.username}/${plugin.repo}/blob/${plugin.branch}`;
 

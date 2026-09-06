@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
-import { marked } from "../deps.ts";
-import type { Resource } from "../types.ts";
+import { marked, type Tokens } from "../deps.ts";
 import { createResource } from "../entities.ts";
+import type { Resource } from "../types.ts";
 
 const URLS = [
 	"https://raw.githubusercontent.com/rockerBOO/awesome-neovim/main/README.md",
@@ -36,16 +36,16 @@ function processMarkdown(text: string) {
 	const resources: Resource[] = [];
 	const tree = marked.lexer(text);
 	let headings: string[] = [];
-	tree.forEach((token: any) => {
+	tree.forEach((token) => {
 		if (token.type === "heading" && token.depth > 1) {
 			headings = headings.slice(0, token.depth - 2);
 			headings.push(token.text.toLocaleLowerCase());
 		}
 
 		if (token.type === "list") {
-			token.items.forEach((t: any) => {
-				(t as any).tokens.forEach((tt: any) => {
-					if (!tt.tokens) return;
+			(token as Tokens.List).items.forEach((t) => {
+				t.tokens.forEach((tt) => {
+					if (!("tokens" in tt) || !tt.tokens) return;
 
 					// hardcoded deny-list for headings
 					for (const heading of headings) {
@@ -64,11 +64,12 @@ function processMarkdown(text: string) {
 					let link = "";
 
 					// first token is always a link
-					const token = tt.tokens[0];
-					if (!token) return;
-					if (!token.href) return;
+					const subToken = tt.tokens[0];
+					if (!subToken) return;
+					if (!("href" in subToken) || typeof subToken.href !== "string")
+						return;
 
-					link = token.href;
+					link = subToken.href;
 					// skip non-github links
 					if (!link.includes("github.com")) return;
 

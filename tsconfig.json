@@ -15,7 +15,6 @@
 		"jsx": "react-jsx",
 		"lib": ["esnext"],
 		"module": "Preserve",
-		"moduleResolution": "node",
 		"noEmit": true,
 		"resolveJsonModule": true,
 		"skipLibCheck": true,

@@ -1,28 +1,27 @@
 import { writeFile } from "node:fs/promises";
-import scrapePluginData from "../../data/scrape.json" with { type: "json" };
 import manualPluginData from "../../data/manual.json" with { type: "json" };
-import scrapeConfigData from "../../data/scrape-config.json" with {
-	type: "json",
-};
 import manualConfigData from "../../data/manual-config.json" with {
 	type: "json",
 };
-
-import type { Resource, ResourceMap } from "../types.ts";
+import scrapePluginData from "../../data/scrape.json" with { type: "json" };
+import scrapeConfigData from "../../data/scrape-config.json" with {
+	type: "json",
+};
 import { getResourceId } from "../entities.ts";
+import type { Resource, ResourceMap } from "../types.ts";
 
 init().catch(console.error);
 
 async function init() {
 	const plugins = patch({
-		scrapeData: scrapePluginData as any,
-		manualData: manualPluginData as any,
+		scrapeData: scrapePluginData as unknown as ResourceContainer,
+		manualData: manualPluginData as unknown as ResourceContainer,
 	});
 	await writeFile("./data/resources.json", plugins);
 
 	const config = patch({
-		scrapeData: scrapeConfigData as any,
-		manualData: manualConfigData as any,
+		scrapeData: scrapeConfigData as unknown as ResourceContainer,
+		manualData: manualConfigData as unknown as ResourceContainer,
 	});
 	await writeFile("./data/resources-config.json", config);
 }

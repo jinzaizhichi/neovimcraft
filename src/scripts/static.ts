@@ -1,11 +1,11 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import htmlFile from "../../data/html.json" with { type: "json" };
 import dbFile from "../../data/db.json" with { type: "json" };
 import configDbFile from "../../data/db-config.json" with { type: "json" };
+import htmlFile from "../../data/html.json" with { type: "json" };
 import { dirname } from "../deps.ts";
+import { getResourceId } from "../entities.ts";
 import { derivePluginData } from "../plugin-data.ts";
 import type { Plugin, PluginData, PluginMap, Tag, TagMap } from "../types.ts";
-import { getResourceId } from "../entities.ts";
 
 const OUTDIR = "./public";
 
@@ -650,10 +650,10 @@ interface HTMLFile {
 
 const htmlData = (htmlFile as HTMLFile).html;
 
-const pluginMap = (dbFile as any).plugins as PluginMap;
+const pluginMap = (dbFile as unknown as { plugins: PluginMap }).plugins;
 const pluginData = derivePluginData(pluginMap);
 render(pluginData, htmlData).then(console.log).catch(console.error);
 
-const configMap = (configDbFile as any).plugins as PluginMap;
+const configMap = (configDbFile as unknown as { plugins: PluginMap }).plugins;
 const configData = derivePluginData(configMap);
 renderConfig(configData, htmlData).then(console.log).catch(console.error);

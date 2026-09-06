@@ -1,8 +1,8 @@
 import { writeFile } from "node:fs/promises";
-import { fetchTopics, ghToken } from "../github.ts";
 import { createResource, getResourceId } from "../entities.ts";
-import type { ResourceMap } from "../types.ts";
 import { denyRepos } from "../filter.ts";
+import { fetchTopics, ghToken } from "../github.ts";
+import type { ResourceMap } from "../types.ts";
 
 init().catch(console.error);
 

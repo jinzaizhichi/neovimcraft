@@ -43,7 +43,7 @@ export interface Resource {
 
 export type ResourceMap = { [key: string]: Resource };
 
-export interface ApiSuccess<D = any> {
+export interface ApiSuccess<D = unknown> {
 	ok: true;
 	next?: string;
 	data: D;

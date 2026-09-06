@@ -2,17 +2,18 @@
 	"name": "neovimcraft",
 	"type": "module",
 	"scripts": {
-		"format": "biome format --write",
+		"fmt": "biome format --write",
+		"lint:fmt": "biome check",
 		"lint": "biome lint",
-		"typecheck": "tsc --noEmit"
+		"tc": "tsc --noEmit",
+		"test": "npm run lint:fmt && npm run tc && npm run lint"
 	},
 	"dependencies": {
 		"marked": "^12.0.2"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.2.7",
-		"@types/marked": "^6.0.0",
-		"@types/node": "^22.13.0",
-		"typescript": "^5.7.0"
+		"@biomejs/biome": "^2.5.12",
+		"@types/node": "^26.4.1",
+		"typescript": "^7.0.2"
 	}
 }

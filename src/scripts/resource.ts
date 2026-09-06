@@ -1,12 +1,12 @@
 import { writeFile } from "node:fs/promises";
-import readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
+import readline from "node:readline/promises";
 import manualFile from "../../data/manual.json" with { type: "json" };
 import manualConfigFile from "../../data/manual-config.json" with {
 	type: "json",
 };
-import type { Resource } from "../types.ts";
 import { createResource } from "../entities.ts";
+import type { Resource } from "../types.ts";
 
 type Option = "plugin" | "config";
 
@@ -57,7 +57,7 @@ async function cli(opt: "config" | "plugin") {
 	}
 
 	return createResource({
-		type: type as any,
+		type: type as Resource["type"],
 		username,
 		repo,
 		tags,

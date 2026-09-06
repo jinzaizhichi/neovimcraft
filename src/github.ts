@@ -1,6 +1,5 @@
-import type { FetchRepoProps, Resp } from "./types.ts";
-
 import { Buffer } from "./deps.ts";
+import type { FetchRepoProps, Resp } from "./types.ts";
 
 const accessToken = process.env["GITHUB_ACCESS_TOKEN"] || "";
 const accessUsername = process.env["GITHUB_USERNAME"] || "";
@@ -14,7 +13,7 @@ function delay(ms: number): Promise<void> {
 
 const nextRe = new RegExp(/<([^<]+)>; rel="next"/);
 
-async function githubApi<D = any>(
+async function githubApi<D = unknown>(
 	endpoint: string,
 	token: string,
 ): Promise<Resp<D>> {
@@ -65,7 +64,7 @@ async function githubApi<D = any>(
 		const link = res.headers.get("link");
 		if (link) {
 			const paginated = nextRe.exec(link || "");
-			if (paginated && paginated[1]) {
+			if (paginated?.[1]) {
 				next = paginated[1];
 			}
 		}
@@ -91,11 +90,14 @@ async function fetchReadme({
 	repo,
 	token,
 }: FetchRepoProps): Promise<Resp<string>> {
-	const result = await githubApi(`/repos/${username}/${repo}/readme`, token);
+	const result = await githubApi<{ download_url: string }>(
+		`/repos/${username}/${repo}/readme`,
+		token,
+	);
 	if (!result.ok) {
 		return {
 			ok: false,
-			data: result.data as any,
+			data: result.data,
 		};
 	}
 
@@ -139,7 +141,7 @@ async function fetchRepo({
 			},
 		};
 	}
-	const result = await githubApi(`/repos/${username}/${repo}`, token);
+	const result = await githubApi<RepoData>(`/repos/${username}/${repo}`, token);
 	return result;
 }
 
@@ -159,7 +161,7 @@ async function fetchBranch({
 	branch,
 	token,
 }: FetchRepoProps & { branch: string }): Promise<Resp<BranchData>> {
-	const result = await githubApi(
+	const result = await githubApi<BranchData>(
 		`/repos/${username}/${repo}/branches/${branch}`,
 		token,
 	);
